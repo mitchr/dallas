@@ -1,0 +1,3 @@
+Prompt A,B,C
+Disp (neg B+sqrt(B^2-4AC))/(2A)
+Disp (neg B-sqrt(B^2-4AC))/(2A)

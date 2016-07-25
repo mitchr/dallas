@@ -1,0 +1,34 @@
+1=B
+2=A
+3=D
+4=D
+5=B
+6=E
+7=A
+8=D
+9=B
+10=A
+11=C
+12=C
+13=B
+14=E
+15=B
+16=C
+17=D
+18=B
+19=C
+20=D
+21=C
+22=E
+23=B
+24=A
+25=B
+26=A
+27=Finite molecular volume & non-zero molecular attractions
+28=238U will effuse more slowly because of its larger mass, allowing it to be extracted from 235U.
+29=288
+31=3x/3=sqrt(x/32)
+PV=nRT; R=0.082
+RMS=sqrt(3RT/M); R=8.3145
+effusion=R1/R2=sqrt(M2/M1)
+density=P*M/R*T
