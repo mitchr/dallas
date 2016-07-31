@@ -31,8 +31,17 @@ func TestDecompile(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	c, err := ioutil.ReadFile("..\\basic_tests\\CHE.8xp")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	d, title := Decompile(b)
-	fmt.Printf("%#v\n%#v", d, title)
+	fmt.Printf("data: %#v\ntitle: %#v\n", d, title)
+
+	d, title = Decompile(c)
+	fmt.Printf("data: %#v\ntitle: %#v\n", d, title)
 }
 
 // try to calculate the checksum from the given data
