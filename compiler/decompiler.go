@@ -2,22 +2,22 @@ package compiler
 
 import (
 	"strconv"
+	"strings"
 )
 
 func Decompile(b []byte) ([]byte, []byte) {
-	// remove newlines and spaces
-	for i, v := range b {
-		if v == byte('\n') || v == byte(' ') {
-			// removes element from slice
-			b = append(b[:i], b[i+1:]...)
-		}
+	// remove spaces and line endings
+	// for Windows compatability, check for "\r\n"
+	newB := string(b)
+	for _, v := range []string{" ", "\r\n", "\n"} {
+		newB = strings.Replace(newB, string(v), "", -1)
 	}
 
 	// split string into 2 hexNum (1 byte) string chunks
 	// we want to convert to string here because adding two numbers will give us the sum, while adding two strings will concatenate them
 	splitB := []string{}
-	for i, j := 0, 1; j < len(b); i, j = i+2, j+2 {
-		splitB = append(splitB, string(b[i])+string(b[j]))
+	for i, j := 0, 1; j < len(newB); i, j = i+2, j+2 {
+		splitB = append(splitB, string(newB[i])+string(newB[j]))
 	}
 
 	for i := 0; i < len(splitB); i++ {
