@@ -1,7 +1,7 @@
 # dallas
 
 ## About
-dallas is a TI-BASIC compiler.
+dallas is a TI-BASIC compiler. It supports the TI-83 and TI-83+/TI-84+.
 
 ## Installation
 `go get github.com/Mitchell-Riley/dallas`
@@ -15,6 +15,7 @@ Flag|Type|Description
 -d|bool|set to true to disassemble .8xp files
 -e|bool|set the edit-lock bit
 -h|bool|display this help message
+-ti83|bool|compile for the TI-83
 -o|string|set the name of the output file (default "PROG.8xp")
 -p|string|set the program name (default "PROG")
 

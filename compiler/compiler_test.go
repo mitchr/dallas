@@ -20,9 +20,8 @@ func TestCompile(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	// fmt.Printf("%#v\n", Compile(f, "TEST", false))
-	_ = f
-	fmt.Printf("%#v\n", Compile(p, "QUAD", false))
+	fmt.Printf("%#v\n", Compile(f, "TEST", false, false))
+	fmt.Printf("%#v\n", Compile(p, "QUAD", false, false))
 }
 
 func TestDecompile(t *testing.T) {

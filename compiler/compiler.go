@@ -66,12 +66,18 @@ func checksum(b []byte) []byte {
 	}
 
 	// mask the upper 16 bits
-	low16 := uint16(sum & 0x0000ffff)
-	return split(low16, binary.LittleEndian)
+	return split(uint16(sum), binary.LittleEndian)
 }
 
-func Compile(f []byte, p string, a bool) []byte {
-	signature := append([]byte("**TI83F*"), 0x1a, 0x0a, 0x00)
+func Compile(f []byte, p string, a bool, t bool) []byte {
+	var identifier string
+	if t {
+		identifier = "**TI83**"
+	} else {
+		identifier = "**TI83F*"
+	}
+
+	signature := append([]byte(identifier), 0x1a, 0x0a, 0x00)
 	comment := make([]byte, 42) // []byte("TESTCOMPILE")
 	comment = append(comment, make([]byte, 42-len(comment))...)
 

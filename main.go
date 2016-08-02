@@ -15,6 +15,7 @@ var (
 	archive  = flag.Bool("a", false, "set the archive bit; if false, ram is used to store the program")
 	lock     = flag.Bool("e", false, "set the edit-lock bit")
 	help     = flag.Bool("h", false, "display this help message")
+	ti83     = flag.Bool("ti83", false, "compile for the TI-83")
 )
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 			*progName = string(b)
 			*outName = *progName + ".tib"
 		} else {
-			output = compiler.Compile(inFile, *progName, *archive)
+			output = compiler.Compile(inFile, *progName, *archive, *ti83)
 		}
 
 		outFile, err := os.Create(*outName)
