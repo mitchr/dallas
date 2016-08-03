@@ -101,7 +101,7 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 		if i > 7 {
 			break
 		}
-		title[i] = byte(r)
+		title[i] = r
 	}
 
 	// len (null terminated)
