@@ -13,7 +13,7 @@ dallas is a TI-BASIC compiler. It supports the TI-83 and TI-83+/TI-84+.
 Flag|Type|Description
 ----|----|----
 -a|bool|set the archive bit; if false, ram is used to store the program
--d|bool|set to true to disassemble .8xp files
+-d|bool|set to disassemble .8xp files
 -e|bool|set the edit-lock bit
 -h|bool|display this help message
 -ti83|bool|compile for the TI-83

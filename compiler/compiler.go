@@ -16,6 +16,7 @@ func isKnownToken(b []byte) []byte {
 	return nil
 }
 
+// takes a pointer so we are able to mutate the slice without having to return it
 func tokenize(b []byte, t *[]byte) {
 	if e := isKnownToken(b); e != nil {
 		*t = append(*t, e...)
@@ -82,8 +83,6 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	comment = append(comment, make([]byte, 42-len(comment))...)
 
 	u := lex(f)
-	// test data so i can work on other parts of this monstrosity
-	// u := []byte{0xde, 0x2a, 0x48, 0x45, 0x4c, 0x4c, 0x4f, 0x29, 0x57, 0x4f, 0x52, 0x4c, 0x44, 0x2d, 0x2a, 0x3f}
 
 	// len(u) = number of tokens present
 	varData := append(split(uint16(len(u)), binary.LittleEndian), u...)
@@ -112,7 +111,7 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	return concatSlices(signature, comment, length, varEntry, checksum)
 }
 
-// split takes a uint16 and splits it into a []byte containing the highest 8 bits and lowest 8 bits
+// split takes a uint16 and returns a []byte containing the highest 8 bits and lowest 8 bits
 func split(u uint16, b binary.ByteOrder) []byte {
 	g := new(bytes.Buffer)
 	binary.Write(g, b, u)

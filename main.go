@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/Mitchell-Riley/dallas/compiler"
 	"io/ioutil"
 	"os"
+
+	"github.com/Mitchell-Riley/dallas/compiler"
 )
 
 var (
-	disAsm   = flag.Bool("d", false, "set to true to disassemble .8xp files")
+	disAsm   = flag.Bool("d", false, "disassemble .8xp files")
 	progName = flag.String("p", "PROG", "set the program name")
 	outName  = flag.String("o", *progName+".8xp", "set the name of the output file")
 	archive  = flag.Bool("a", false, "set the archive bit; if false, ram is used to store the program")
