@@ -106,10 +106,10 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 
 	// len (null terminated)
 	length := split(uint16(len(varData)), binary.LittleEndian)
-	varEntry := concatSlice([]byte{0x0d, 0x00}, length, []byte{0x05}, title, []byte{0x00, archive}, length, varData)
+	varEntry := concatSlices([]byte{0x0d, 0x00}, length, []byte{0x05}, title, []byte{0x00, archive}, length, varData)
 	checksum := checksum(varEntry)
 
-	return concatSlice(signature, comment, length, varEntry, checksum)
+	return concatSlices(signature, comment, length, varEntry, checksum)
 }
 
 // split takes a uint16 and splits it into a []byte containing the highest 8 bits and lowest 8 bits
@@ -119,7 +119,7 @@ func split(u uint16, b binary.ByteOrder) []byte {
 	return g.Bytes()
 }
 
-func concatSlice(slices ...[]byte) []byte {
+func concatSlices(slices ...[]byte) []byte {
 	var newSlice []byte
 	for _, v := range slices {
 		newSlice = append(newSlice, v...)
