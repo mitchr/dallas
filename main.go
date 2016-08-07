@@ -23,39 +23,37 @@ func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "dallas is a TI-BASIC Compiler and Decompiler\n\nUsage:\n\tdallas [flags] filename\n\nFlags:\n")
 		flag.PrintDefaults()
+		os.Exit(0)
 	}
 	flag.Parse()
 
 	inName := flag.Arg(0)
-	fmt.Println(inName)
-
 	if inName == "" || *help {
 		flag.Usage()
+	}
+
+	inFile, err := ioutil.ReadFile(inName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var output []byte
+	if *disAsm == true {
+		var b []byte
+		output, b = compiler.Decompile(inFile)
+		*progName = string(b)
+		*outName = *progName + ".tib"
 	} else {
-		//this is all in the else block temporarily
-		inFile, err := ioutil.ReadFile(inName)
-		if err != nil {
-			fmt.Println(err)
-		}
+		output = compiler.Compile(inFile, *progName, *archive, *ti83)
+	}
 
-		var output []byte
-		if *disAsm == true {
-			var b []byte
-			output, b = compiler.Decompile(inFile)
-			*progName = string(b)
-			*outName = *progName + ".tib"
-		} else {
-			output = compiler.Compile(inFile, *progName, *archive, *ti83)
-		}
+	outFile, err := os.Create(*outName)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		outFile, err := os.Create(*outName)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		_, err = outFile.Write(output)
-		if err != nil {
-			fmt.Println(err)
-		}
+	_, err = outFile.Write(output)
+	if err != nil {
+		fmt.Println(err)
 	}
 }
