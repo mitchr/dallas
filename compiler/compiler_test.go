@@ -39,6 +39,10 @@ func TestDecompile(t *testing.T) {
 
 	d, title = Decompile(c)
 	fmt.Printf("data: %s\ntitle: %s\n", d, title)
+
+	d, title = Decompile(Compile([]byte("B-A=6"),
+		"TEST", false, false))
+	fmt.Printf("data: %s\ntitle: %s\n", d, title)
 }
 
 // calculate the checksum from the given data

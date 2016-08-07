@@ -6,8 +6,41 @@ import (
 )
 
 func Decompile(b []byte) ([]byte, []byte) {
+	// check if b was built from dallas, or some other compiler
+	// for some reason, other compilers spit out each byte as a pair of 2 ascii characters, where as dallas prints both characters together as an element of a []byte
+	cleanB := make([]uint16, len(b))
+	if b[0] == 50 {
+		// first byte is interpreted as "2"
+		cleanB = clean(b)
+	} else if b[0] == 42 {
+		// first byte is interpreted as "2a", or "*" (compiled by dallas)
+		for i, v := range b {
+			cleanB[i] = uint16(v)
+		}
+	}
+
+	// remove last 2 elements from slice, aka the checksum
+	cleanB = cleanB[:len(cleanB)-2]
+
+	const dataOffset = 0x37 + 0x11 + 0x02 // = 4a
+	const titleOffset = 0x37 + 0x05
+
+	var data []byte
+	for i := dataOffset; i < len(cleanB); i++ {
+		data = append(data, []byte(backwardsLex(cleanB[i]))...)
+	}
+
+	var title []byte
+	for i := titleOffset; i <= titleOffset+7; i++ {
+		title = append(title, []byte(backwardsLex(cleanB[i]))...)
+	}
+
+	return data, title
+}
+
+func clean(b []byte) []uint16 {
 	// remove spaces and line endings
-	// for Windows compatability, check for "\r\n"
+	// for Windows compatibility, check for "\r\n"
 	newB := string(b)
 	for _, v := range []string{" ", "\r\n", "\n"} {
 		newB = strings.Replace(newB, string(v), "", -1)
@@ -39,23 +72,7 @@ func Decompile(b []byte) ([]byte, []byte) {
 		cleanB = append(cleanB, uint16(c))
 	}
 
-	// remove last 2 elements from slice, aka the checksum
-	cleanB = cleanB[:len(cleanB)-2]
-
-	const dataOffset = 0x37 + 0x11 + 0x02 // = 4a
-	const titleOffset = 0x37 + 0x05
-
-	var data []byte
-	for i := dataOffset; i < len(cleanB); i++ {
-		data = append(data, []byte(backwardsLex(cleanB[i]))...)
-	}
-
-	var title []byte
-	for i := titleOffset; i <= titleOffset+7; i++ {
-		title = append(title, []byte(backwardsLex(cleanB[i]))...)
-	}
-
-	return data, title
+	return cleanB
 }
 
 func backwardsLex(u uint16) string {
