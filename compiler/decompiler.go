@@ -1,9 +1,6 @@
 package compiler
 
-import (
-	"strconv"
-	"strings"
-)
+import "strconv"
 
 func Decompile(b []byte) ([]byte, []byte) {
 	// check if b was built from dallas, or some other compiler
@@ -41,10 +38,15 @@ func Decompile(b []byte) ([]byte, []byte) {
 func clean(b []byte) []uint16 {
 	// remove spaces and line endings
 	// for Windows compatibility, check for "\r\n"
-	newB := string(b)
-	for _, v := range []string{" ", "\r\n", "\n"} {
-		newB = strings.Replace(newB, string(v), "", -1)
+	for i, v := range b {
+		if v == ' ' || v == '\r' || v == '\n' {
+			b = append(b[:i], b[i+1:]...)
+		}
 	}
+
+	splitSource := split(b)
+	return splitSource
+}
 
 func split(b []byte) []uint16 {
 	// split string into 2 hexNum (1 byte) string chunks
