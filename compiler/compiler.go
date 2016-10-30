@@ -68,6 +68,18 @@ func checksum(b []byte) []byte {
 
 	// mask the upper 16 bits
 	return split(uint16(sum), binary.LittleEndian)
+
+func title(p string) []byte {
+	// if title is less than 8, 0 pad the right
+	title := make([]byte, 8)
+	for i, r := range lex([]byte(p)) {
+		// this will fail if p > 8, so do some bounds checking
+		if i > 7 {
+			break
+		}
+		title[i] = r
+	}
+	return title
 }
 
 func Compile(f []byte, p string, a bool, t bool) []byte {
@@ -93,22 +105,12 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	}
 	// split(archive, binary.BigEndian)
 
-	// if title is less than 8, 0 pad the right
-	title := make([]byte, 8)
-	for i, r := range lex([]byte(p)) {
-		// this will fail if p > 8, so do some bounds checking
-		if i > 7 {
-			break
-		}
-		title[i] = r
-	}
 
 	// len (null terminated)
 	length := split(uint16(len(varData)), binary.LittleEndian)
-	varEntry := concatSlices([]byte{0x0d, 0x00}, length, []byte{0x05}, title, []byte{0x00, archive}, length, varData)
-	checksum := checksum(varEntry)
+	varEntry := concatBytes(0x0d, 0x00, length, 0x05, title(p), 0x00, archive, length, varData)
 
-	return concatSlices(signature, comment, length, varEntry, checksum)
+	return concatBytes(signature, comment, length, varEntry, checksum(varEntry))
 }
 
 // split takes a uint16 and returns a []byte containing the highest 8 bits and lowest 8 bits
@@ -118,10 +120,17 @@ func split(u uint16, b binary.ByteOrder) []byte {
 	return g.Bytes()
 }
 
-func concatSlices(slices ...[]byte) []byte {
-	var newSlice []byte
-	for _, v := range slices {
-		newSlice = append(newSlice, v...)
+func concatBytes(e ...interface{}) []byte {
+	var slice []byte
+	for _, v := range e {
+		switch v.(type) {
+		case byte:
+			slice = append(slice, []byte{v.(byte)}...)
+		case int:
+			slice = append(slice, []byte{byte(v.(int))}...)
+		case []byte:
+			slice = append(slice, v.([]byte)...)
+		}
 	}
-	return newSlice
+	return slice
 }
