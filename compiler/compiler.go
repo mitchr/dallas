@@ -11,7 +11,7 @@ func isKnownToken(b []byte) []byte {
 	}
 	if e, ok := twoBytes[string(b)]; ok {
 		// not sure why this needs to be in BidEndian, but otherwise it's fucked
-		return split(e, binary.BigEndian)
+		return splitUint16(e, binary.BigEndian)
 	}
 	return nil
 }
@@ -61,13 +61,13 @@ func lex(b []byte) []byte {
 }
 
 func checksum(b []byte) []byte {
-	var sum uint32
+	var sum uint16
 	for _, v := range b {
-		sum += uint32(v)
+		sum += uint16(v)
 	}
 
-	// mask the upper 16 bits
-	return split(uint16(sum), binary.LittleEndian)
+	return splitUint16(sum, binary.LittleEndian)
+}
 
 func title(p string) []byte {
 	// if title is less than 8, 0 pad the right
@@ -97,24 +97,22 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	u := lex(f)
 
 	// len(u) = number of tokens present
-	varData := append(split(uint16(len(u)), binary.LittleEndian), u...)
+	varData := append(splitUint16(uint16(len(u)), binary.LittleEndian), u...)
 
 	var archive byte = 0x00
 	if a {
 		archive = 0x80
 	}
-	// split(archive, binary.BigEndian)
-
 
 	// len (null terminated)
-	length := split(uint16(len(varData)), binary.LittleEndian)
+	length := splitUint16(uint16(len(varData)), binary.LittleEndian)
 	varEntry := concatBytes(0x0d, 0x00, length, 0x05, title(p), 0x00, archive, length, varData)
 
 	return concatBytes(signature, comment, length, varEntry, checksum(varEntry))
 }
 
-// split takes a uint16 and returns a []byte containing the highest 8 bits and lowest 8 bits
-func split(u uint16, b binary.ByteOrder) []byte {
+// splitUint16 takes a uint16 and returns a []byte containing 2 8-bit elements ordered depending by the byte order argument
+func splitUint16(u uint16, b binary.ByteOrder) []byte {
 	g := new(bytes.Buffer)
 	binary.Write(g, b, u)
 	return g.Bytes()
