@@ -46,33 +46,30 @@ func clean(b []byte) []uint16 {
 		newB = strings.Replace(newB, string(v), "", -1)
 	}
 
+func split(b []byte) []uint16 {
 	// split string into 2 hexNum (1 byte) string chunks
 	// we want to convert to string here because adding two numbers will give us the sum, while adding two strings will concatenate them
-	splitB := []string{}
-	for i, j := 0, 1; j < len(newB); i, j = i+2, j+2 {
-		splitB = append(splitB, string(newB[i])+string(newB[j]))
+	hexSource := []byte{}
+	for _, v := range string(b) {
+		c, _ := strconv.ParseUint(string(v), 16, 8)
+		hexSource = append(hexSource, byte(c))
 	}
 
-	for i := 0; i < len(splitB); i++ {
-		// first bytes of 2-byte tokens
-		if v := splitB[i]; v == "5d" || v == "5e" || v == "7e" || v == "aa" || v == "bb" {
-			splitB[i] += splitB[i+1]
-			splitB = append(splitB[:i+1], splitB[i+2:]...)
+	splitSource := []uint16{}
+	for i, j := 0, 1; j < len(hexSource); i, j = i+2, j+2 {
+		splitSource = append(splitSource, uint16(hexSource[i]<<4)|uint16(hexSource[j]))
+	}
+
+	// 2-byte elements exist as 2 separate elements right now
+	// loop through and combine them so they exist as one element
+	for i := 0; i < len(splitSource); i++ {
+		if is2ByteDelimeter(byte(splitSource[i])) {
+			splitSource[i] = (uint16(splitSource[i] << 8)) | uint16(splitSource[i+1])
+			splitSource = append(splitSource[:i+1], splitSource[i+2:]...)
 		}
 	}
 
-	cleanB := []uint16{}
-	for _, v := range splitB {
-		var c uint64
-		if len(v) == 2 {
-			c, _ = strconv.ParseUint(v, 16, 8)
-		} else if len(v) == 4 {
-			c, _ = strconv.ParseUint(v, 16, 16)
-		}
-		cleanB = append(cleanB, uint16(c))
-	}
-
-	return cleanB
+	return splitSource
 }
 
 func backwardsLex(u uint16) string {
@@ -83,4 +80,8 @@ func backwardsLex(u uint16) string {
 		return p
 	}
 	return ""
+}
+
+func is2ByteDelimeter(b byte) bool {
+	return b == 0x5d || b == 0x5e || b == 0x7e || b == 0xaa || b == 0xbb
 }
