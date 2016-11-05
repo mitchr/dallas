@@ -5,7 +5,8 @@ import (
 	"encoding/binary"
 )
 
-func isKnownToken(b []byte) []byte {
+// returns nil if false
+func tokenMatch(b []byte) []byte {
 	if e, ok := oneBytes[string(b)]; ok {
 		return []byte{e}
 	}
@@ -18,12 +19,12 @@ func isKnownToken(b []byte) []byte {
 
 // takes a pointer so we are able to mutate the slice without having to return it
 func tokenize(b []byte, t *[]byte) {
-	if e := isKnownToken(b); e != nil {
+	if e := tokenMatch(b); e != nil {
 		*t = append(*t, e...)
 	} else {
 		// range over every rune and match it with a token
 		for _, v := range b {
-			if e := isKnownToken([]byte{v}); e != nil {
+			if e := tokenMatch([]byte{v}); e != nil {
 				*t = append(*t, e...)
 			}
 		}
