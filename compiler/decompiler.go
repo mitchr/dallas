@@ -6,36 +6,55 @@ func Decompile(b []byte) ([]byte, []byte) {
 	// check if b was built from dallas, or some other compiler
 	// for some reason, other compilers spit out each byte as a pair of 2 ascii characters, where as dallas prints both characters together as an element of a []byte
 	cleanSource := make([]uint16, len(b))
+	// first byte is interpreted as "2"
 	if b[0] == 50 {
-		// first byte is interpreted as "2"
-		cleanSource = clean(b)
-	} else if b[0] == 42 {
+		// split string into 2 hexNum (1 byte) string chunks
+		// we want to convert to string here because adding two numbers will give us the sum, while adding two strings will concatenate them
+		b = clean(b)
+
+		hexSource := []byte{}
+		for _, v := range string(b) {
+			c, _ := strconv.ParseUint(string(v), 16, 8)
+			hexSource = append(hexSource, byte(c))
+		}
+
+		// combine
+		splitSource := []byte{}
+		for i, j := 0, 1; j < len(hexSource); i, j = i+2, j+2 {
+			splitSource = append(splitSource, byte(hexSource[i]<<4)|byte(hexSource[j]))
+		}
+
+		cleanSource = split(splitSource)
+
+	} else if b[0] == 0x2a {
 		// first byte is interpreted as "2a", or "*" (compiled by dallas)
 		for i, v := range b {
 			cleanSource[i] = uint16(v)
 		}
+
+		cleanSource = split(clean(b))
 	}
 
-	// remove last 2 elements from slice, aka the checksum
-	cleanSource = cleanSource[:len(cleanSource)-2]
-
-	const dataOffset = 0x37 + 0x11 + 0x02 // = 4a
-	const titleOffset = 0x37 + 0x05
+	// now we subtract 0x02 from each offset for some reason
+	// I legitimately do not know why, but I won't question it
+	const dataOffset = 0x37 + 0x11 + 0x02 - 0x02
+	const titleOffset = 0x37 + 0x05 - 0x02
 
 	var data []byte
-	for i := dataOffset; i < len(cleanSource); i++ {
-		data = append(data, []byte(backwardsLex(cleanSource[i]))...)
+	// minus the checksum
+	for _, v := range cleanSource[dataOffset : len(cleanSource)-2] {
+		data = append(data, []byte(backwardsLex(v))...)
 	}
 
 	var title []byte
-	for i := titleOffset; i <= titleOffset+7; i++ {
-		title = append(title, []byte(backwardsLex(cleanSource[i]))...)
+	for _, v := range cleanSource[titleOffset : titleOffset+7] {
+		title = append(title, []byte(backwardsLex(v))...)
 	}
 
 	return data, title
 }
 
-func clean(b []byte) []uint16 {
+func clean(b []byte) []byte {
 	// remove spaces and line endings
 	// for Windows compatibility, check for "\r\n"
 	for i, v := range b {
@@ -43,27 +62,17 @@ func clean(b []byte) []uint16 {
 			b = append(b[:i], b[i+1:]...)
 		}
 	}
-
-	splitSource := split(b)
-	return splitSource
+	return b
 }
 
 func split(b []byte) []uint16 {
-	// split string into 2 hexNum (1 byte) string chunks
-	// we want to convert to string here because adding two numbers will give us the sum, while adding two strings will concatenate them
-	hexSource := []byte{}
-	for _, v := range string(b) {
-		c, _ := strconv.ParseUint(string(v), 16, 8)
-		hexSource = append(hexSource, byte(c))
-	}
-
-	splitSource := []uint16{}
-	for i, j := 0, 1; j < len(hexSource); i, j = i+2, j+2 {
-		splitSource = append(splitSource, uint16(hexSource[i]<<4)|uint16(hexSource[j]))
-	}
-
 	// 2-byte elements exist as 2 separate elements right now
 	// loop through and combine them so they exist as one element
+	splitSource := make([]uint16, len(b))
+	for i, v := range b {
+		splitSource[i] = uint16(v)
+	}
+
 	for i := 0; i < len(splitSource); i++ {
 		if is2ByteDelimeter(byte(splitSource[i])) {
 			splitSource[i] = (uint16(splitSource[i] << 8)) | uint16(splitSource[i+1])
