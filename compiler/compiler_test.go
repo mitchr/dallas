@@ -1,48 +1,68 @@
 package compiler
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"testing"
 )
 
+type testData struct {
+	inputFile      string
+	expectedOutput string
+}
+
 func TestCompile(t *testing.T) {
-	f, err := ioutil.ReadFile("../basic_tests/test.tib")
-	if err != nil {
-		fmt.Println(err)
+	testFiles := []testData{
+		{"../basic_tests/test.tib", "../basic_tests/test.8xp"},
+		// {"../basic_tests/quad.tib", ""},
+		// {"../basic_tests/radical.tib", ""},
 	}
 
-	p, err := ioutil.ReadFile("../basic_tests/quad.tib")
-	if err != nil {
-		fmt.Println(err)
-	}
+	for _, v := range testFiles {
+		b, err := ioutil.ReadFile(v.inputFile)
+		if err != nil {
+			t.Skip("Test file not found: ", v.inputFile)
+		}
 
-	fmt.Printf("%#v\n", Compile(f, "TEST", false, false))
-	fmt.Printf("%#v\n", Compile(p, "QUAD", false, false))
+		e, err := ioutil.ReadFile(v.expectedOutput)
+		if err != nil {
+			t.Skip("Test file not found: ", v.expectedOutput)
+		}
+
+		d := Compile(b, "TEST", false, false)
+
+		if string(d) != string(e) {
+			t.Fail()
+		}
+	}
 }
 
 func TestDecompile(t *testing.T) {
-	b, err := ioutil.ReadFile("../basic_tests/test.8xp")
-	if err != nil {
-		fmt.Println(err)
+	testFiles := []testData{
+		{"../basic_tests/test.8xp", "../basic_tests/test.tib"},
+		{"../basic_tests/CHE.8xp", "../basic_tests/CHE.tib"},
+		// {"../basic_tests/radical.8xp", ""},
 	}
+	// testRawData := [][]byte{[]byte("ClearEntries")}
 
-	c, err := ioutil.ReadFile("../basic_tests/CHE.8xp")
-	if err != nil {
-		fmt.Println(err)
+	for _, v := range testFiles {
+		b, err := ioutil.ReadFile(v.inputFile)
+		if err != nil {
+			t.Skip("Test file not found: ", v.inputFile)
+		}
+
+		e, err := ioutil.ReadFile(v.expectedOutput)
+		if err != nil {
+			t.Skip("Test file not found: ", v.expectedOutput)
+		}
+
+		d, _ := Decompile(b)
+
+		if string(d) != string(e) {
+			t.Fail()
+		}
 	}
-
-	d, title := Decompile(b)
-	fmt.Printf("data: %s\ntitle: %s\n", d, title)
-
-	d, title = Decompile(c)
-	fmt.Printf("data: %s\ntitle: %s\n", d, title)
-
-	d, title = Decompile(Compile([]byte("B-A=6"),
-		"TEST", false, false))
-	fmt.Printf("data: %s\ntitle: %s\n", d, title)
 }
 
 // calculate the checksum from the given data
@@ -54,23 +74,17 @@ func TestChecksum(t *testing.T) {
 	fmt.Println(len(s))
 	fmt.Printf("%#v\n", s)
 
-	var sum uint32
+	var sum uint16
 	for _, v := range s {
-		sum += uint32(v)
+		sum += uint16(v)
 	}
 
-	low16 := uint16(sum & 0x0000ffff)
-	// hi8 := byte(low16 & 0xff)
-	// low8 := byte((low16 >> 8)) //& 0xff)
-
-	// fmt.Printf("%x, %x\n", sum, low16)
-	// fmt.Printf("%x, %x\n", hi8, low8)
-
-	// this gives the same results
-	c := new(bytes.Buffer)
-	binary.Write(c, binary.LittleEndian, low16)
-
-	if fmt.Sprintf("%x", c.Bytes()) != "4906" {
+	low16 := splitUint16(sum, binary.LittleEndian)
+	if fmt.Sprintf("%x", low16) != "4906" {
 		t.Fail()
 	}
+}
+
+func TestTitle(t *testing.T) {
+	fmt.Println(title("WHERE"))
 }
