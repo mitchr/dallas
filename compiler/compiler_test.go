@@ -86,5 +86,24 @@ func TestChecksum(t *testing.T) {
 }
 
 func TestTitle(t *testing.T) {
-	fmt.Println(title("WHERE"))
+	tests := []string{
+		"AVALANCHE",
+		"BAMBOOZLE",
+		"ZIGZAGGING",
+		"BEDAZZLING",
+		"LUMBERJACK",
+		"MOZZARELLA",
+		"JAYWALKING",
+		"a",
+		",",
+		"~",
+		"asdlhfiuwehqcwo8rqw89enryc9823nc792c29378c32789q2789y3q278932y7r82q3yr78932qyr98",
+		"789067907",
+	}
+
+	for _, v := range tests {
+		if len(title(v)) > 8 {
+			t.Fail()
+		}
+	}
 }
