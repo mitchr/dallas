@@ -120,16 +120,16 @@ func splitUint16(u uint16, b binary.ByteOrder) []byte {
 }
 
 func concatBytes(e ...interface{}) []byte {
-	var slice []byte
+	var temp []byte
 	for _, v := range e {
 		switch v.(type) {
 		case byte:
-			slice = append(slice, []byte{v.(byte)}...)
+			temp = append(temp, []byte{v.(byte)}...)
 		case int:
-			slice = append(slice, []byte{byte(v.(int))}...)
+			temp = append(temp, []byte{byte(v.(int))}...)
 		case []byte:
-			slice = append(slice, v.([]byte)...)
+			temp = append(temp, v.([]byte)...)
 		}
 	}
-	return slice
+	return temp
 }
