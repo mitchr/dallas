@@ -3,30 +3,34 @@ package compiler
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 )
 
-// returns nil if false
-func tokenMatch(b []byte) []byte {
+// return err if no token could be found for the given input
+func tokenMatch(b []byte) ([]byte, error) {
 	if e, ok := oneBytes[string(b)]; ok {
-		return []byte{e}
+		return []byte{e}, nil
 	}
 	if e, ok := twoBytes[string(b)]; ok {
-		// not sure why this needs to be in BidEndian, but otherwise it's fucked
-		return splitUint16(e, binary.BigEndian)
+		// not sure why this needs to be in BigEndian, but otherwise it's fucked
+		return splitUint16(e, binary.BigEndian), nil
 	}
-	return nil
+	return nil, fmt.Errorf("token not found %s", string(b))
 }
 
+// tokenizes a []byte b and appends it to *[]byte t
 // takes a pointer so we are able to mutate the slice without having to return it
 func tokenize(b []byte, t *[]byte) {
-	if e := tokenMatch(b); e != nil {
+	if e, err := tokenMatch(b); err == nil {
 		*t = append(*t, e...)
 	} else {
 		// range over every rune and match it with a token
 		for _, v := range b {
-			if e := tokenMatch([]byte{v}); e != nil {
+			if e, err := tokenMatch([]byte{v}); err == nil {
 				*t = append(*t, e...)
-			}
+			} // else {
+			// 	return err
+			// }
 		}
 	}
 }
