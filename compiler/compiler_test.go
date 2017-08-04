@@ -7,14 +7,12 @@ import (
 	"testing"
 )
 
-type testData struct {
-	inputFile      string
-	expectedOutput string
-}
-
 func TestCompile(t *testing.T) {
-	testFiles := []testData{
-		{"../basic_tests/test.tib", "../basic_tests/test.8xp"},
+	testFiles := []struct {
+		inputFile      string
+		expectedOutput string
+	}{
+		{"../basic_tests/test.tib", "../basic_tests/TEST (dallas).8xp"},
 		// {"../basic_tests/quad.tib", ""},
 		// {"../basic_tests/radical.tib", ""},
 	}
@@ -39,10 +37,19 @@ func TestCompile(t *testing.T) {
 }
 
 func TestDecompile(t *testing.T) {
-	testFiles := []testData{
-		{"../basic_tests/test.8xp", "../basic_tests/test.tib"},
-		{"../basic_tests/CHE.8xp", "../basic_tests/CHE.tib"},
-		// {"../basic_tests/radical.8xp", ""},
+
+	testFiles := []struct {
+		inputFile      string
+		expectedOutput string
+		title          string
+	}{
+		{"../basic_tests/TEST (dallas).8xp", "../basic_tests/test.tib", "TEST"},
+
+		{"../basic_tests/CHE (sourcecoder).8xp", "../basic_tests/CHE.tib", "CHE"},
+		{"../basic_tests/CHE (tokens).8xp", "../basic_tests/CHE.tib", "CHE"},
+		{"../basic_tests/CHE (dallas).8xp", "../basic_tests/CHE.tib", "CHE"},
+
+		{"../basic_tests/RAD (sourcecoder).8xp", "../basic_tests/radical.tib", "RAD"},
 	}
 	// testRawData := [][]byte{[]byte("ClearEntries")}
 
@@ -57,9 +64,14 @@ func TestDecompile(t *testing.T) {
 			t.Skip("Test file not found: ", v.expectedOutput)
 		}
 
-		d, _ := Decompile(b)
+		d, title := Decompile(b)
 
 		if string(d) != string(e) {
+			fmt.Println(string(d))
+			t.Fail()
+		}
+
+		if string(title) != v.title {
 			t.Fail()
 		}
 	}
