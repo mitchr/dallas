@@ -42,21 +42,17 @@ func Decompile(b []byte) ([]byte, []byte) {
 // (i.e. []uint16{0xbb01} is []byte{0xbb, 0x01})
 // loop through and combine these separate bytes into a single uint16
 func combine2ByteElements(b []byte) []uint16 {
-	// convert []byte to []uint16
-	source := make([]uint16, len(b))
-	for i, v := range b {
-		source[i] = uint16(v)
-	}
-
-	for i := 0; i < len(source); i++ {
-		if is2ByteDelimeter(byte(source[i])) {
+	source := []uint16{}
+	for i := 0; i < len(b); i++ {
+		if is2ByteDelimeter(b[i]) {
 			// combine the 2 elements
-			source[i] = (uint16(source[i] << 8)) | uint16(source[i+1])
-			// removed the 2 combined elements from the slice
-			source = append(source[:i+1], source[i+2:]...)
+			source = append(source, (uint16(b[i])<<8)|uint16(b[i+1]))
+			// remove the 2 combined elements from b
+			b = append(b[:i+1], b[i+2:]...)
+			continue
 		}
+		source = append(source, uint16(b[i]))
 	}
-
 	return source
 }
 
