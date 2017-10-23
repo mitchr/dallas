@@ -47,8 +47,9 @@ func combine2ByteElements(b []byte) []uint16 {
 		if is2ByteDelimeter(b[i]) {
 			// combine the 2 elements
 			source = append(source, (uint16(b[i])<<8)|uint16(b[i+1]))
-			// remove the 2 combined elements from b
-			b = append(b[:i+1], b[i+2:]...)
+			// advance one space so we skip the second half of the token
+			// that was already consumed by the above line
+			i = i + 1
 			continue
 		}
 		source = append(source, uint16(b[i]))
