@@ -51,7 +51,7 @@ func lex(b []byte) []byte {
 			// v is only 1 element, so it can only belong to oneBytes
 			tokBuf = append(tokBuf, oneBytes[string(v)])
 			curTok = []byte{}
-		case ' ', '(':
+		case ' ': //'(':
 			curTok = append(curTok, v)
 			tokenize(curTok, &tokBuf)
 			curTok = []byte{}
