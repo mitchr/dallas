@@ -36,7 +36,6 @@ func TestCompile(t *testing.T) {
 }
 
 func TestDecompile(t *testing.T) {
-
 	testFiles := []struct {
 		inputFile      string
 		expectedOutput string
@@ -95,11 +94,28 @@ func TestQuine(t *testing.T) {
 			t.Fail()
 		}
 	}
-
 }
 
+func TestParseNegOrMinus(t *testing.T) {
+	tests := []struct {
+		data []byte
+		neg  bool
+	}{
+		{[]byte(`-3`), true},
+		{[]byte(`(-3)`), true},
+		{[]byte(`- 3`), true},
+		{[]byte(`-(-3)`), true},
+
+		{[]byte(`1-3`), false},
+		{[]byte(`1 - 3`), false},
+		{[]byte(`(1-3)`), false},
 	}
 
+	for _, v := range tests {
+		neg := parseNegOrMinus(v.data)
+		if neg != v.neg {
+			t.Fail()
+		}
 	}
 }
 

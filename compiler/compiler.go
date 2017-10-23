@@ -40,6 +40,7 @@ func lex(b []byte) []byte {
 	var curTok []byte
 	for i, v := range b {
 		switch v {
+		// case '-':
 		case '\r', '\n', '+', '-', '*', '/', '^', '=':
 			// on Windows, carriage return contains 2 characters, but we only care about '\n'
 			if v == '\r' {
@@ -64,6 +65,31 @@ func lex(b []byte) []byte {
 		}
 	}
 	return tokBuf
+}
+
+// Check if the '-' is a negative, or if it is performing subtraction
+// taken from http://math.stackexchange.com/a/217316:
+// - If you have numbers or variables on both sides of symbol −− then it means substraction.
+// - If you have no number or variables before the symbol −− then it means negation.
+//   Beware: parenthesis aren't variables.
+// returns true for negative, false for subtraction
+func parseNegOrMinus(b []byte) bool {
+	const NEG = 0xB0 // 176
+	const SUB = 0x71 // 45
+
+	// keep track of the previous rune in the sequence
+	var previous byte
+	for i, v := range b {
+		if v == '-' {
+			// also check if the first index of b is a '-';
+			// short circuit, but not sure if it's worth it
+			if i == 0 || previous == '(' || previous == '\n' || previous == '\r' {
+				return true
+			}
+		}
+		previous = v
+	}
+	return false
 }
 
 // returns the lower 16 bits of the sum of all bytes in b
