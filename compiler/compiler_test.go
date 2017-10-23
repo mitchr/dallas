@@ -76,8 +76,27 @@ func TestDecompile(t *testing.T) {
 	}
 }
 
+// decompiling the compilation should give back the original source code
+func TestQuine(t *testing.T) {
+	testFiles := []string{
+		"../basic_tests/test.tib",
+		"../basic_tests/CHE.tib",
+		"../basic_tests/radical.tib",
+	}
 
+	for _, v := range testFiles {
+		b, err := ioutil.ReadFile(v)
+		if err != nil {
+			t.Fail()
+		}
 
+		out, _ := Decompile(Compile(b, "TEST", false, false))
+		if string(out) != string(b) {
+			t.Fail()
+		}
+	}
+
+}
 
 	}
 
