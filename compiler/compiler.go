@@ -48,6 +48,7 @@ func lex(b []byte) []byte {
 
 			tokenize(curTok, &tokBuf)
 			// depending on what v is, append it so it doesn't get lost
+			// v is only 1 element, so it can only belong to oneBytes
 			tokBuf = append(tokBuf, oneBytes[string(v)])
 			curTok = []byte{}
 		case ' ', '(':
@@ -65,6 +66,7 @@ func lex(b []byte) []byte {
 	return tokBuf
 }
 
+// returns the lower 16 bits of the sum of all bytes in b
 func checksum(b []byte) []byte {
 	var sum uint16
 	for _, v := range b {
@@ -78,7 +80,7 @@ func title(p string) []byte {
 	// if title is less than 8, 0 pad the right
 	title := make([]byte, 8)
 	for i, r := range lex([]byte(p)) {
-		// this will fail if p > 8, so do some bounds checking
+		// this will fail if len(p) > 8, so do some bounds checking
 		if i > 7 {
 			break
 		}
@@ -88,23 +90,21 @@ func title(p string) []byte {
 }
 
 func Compile(f []byte, p string, a bool, t bool) []byte {
-	var identifier string
+	identifier := "**TI83F*"
 	if t {
 		identifier = "**TI83**"
-	} else {
-		identifier = "**TI83F*"
 	}
 
 	signature := append([]byte(identifier), 0x1a, 0x0a, 0x00)
-	comment := make([]byte, 42) // []byte("TESTCOMPILE")
+	comment := make([]byte, 42) // []byte("COMPILED BY DALLAS")
 	comment = append(comment, make([]byte, 42-len(comment))...)
 
-	u := lex(f)
+	tokens := lex(f)
 
-	// len(u) = number of tokens present
-	varData := append(splitUint16(uint16(len(u)), binary.LittleEndian), u...)
+	// len(tokens) = number of tokens present
+	varData := append(splitUint16(uint16(len(tokens)), binary.LittleEndian), tokens...)
 
-	var archive byte = 0x00
+	archive := 0x00
 	if a {
 		archive = 0x80
 	}
@@ -116,7 +116,8 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	return concatBytes(signature, comment, length, varEntry, checksum(varEntry))
 }
 
-// splitUint16 takes a uint16 and returns a []byte containing 2 8-bit elements ordered depending by the byte order argument
+// splitUint16 takes a uint16 and returns a []byte containing 2 8-bit
+// elements ordered depending on the byte order argument
 func splitUint16(u uint16, b binary.ByteOrder) []byte {
 	g := new(bytes.Buffer)
 	binary.Write(g, b, u)
