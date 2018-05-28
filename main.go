@@ -11,11 +11,11 @@ import (
 
 var (
 	disAsm   = flag.Bool("d", false, "disassemble .8xp files")
-	progName = flag.String("p", "PROG", "set the program name")
+	progName = flag.String("p", "PROG", "set the program name (only for compilation)")
 	archive  = flag.Bool("a", false, "set the archive bit; if false, ram is used to store the program")
 	lock     = flag.Bool("e", false, "set the edit-lock bit")
 	help     = flag.Bool("h", false, "display this help message")
-	ti83     = flag.Bool("ti83", false, "compile for the TI-83")
+	ti83     = flag.Bool("ti83", false, "compile for the TI-83 (compiles for TI-84 by default)")
 )
 
 func main() {
