@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -142,12 +141,13 @@ func Compile(f []byte, p string, a bool, t bool) []byte {
 	return concatBytes(signature, comment, length, varEntry, checksum(varEntry))
 }
 
-// splitUint16 takes a uint16 and returns a []byte containing 2 8-bit
-// elements ordered depending on the byte order argument
+// splitUint16 takes a uint16 and returns a []byte containing the hi and
+// low 8-bits of u ordered depending on the byte order argument
 func splitUint16(u uint16, b binary.ByteOrder) []byte {
-	g := new(bytes.Buffer)
-	binary.Write(g, b, u)
-	return g.Bytes()
+	if b == binary.LittleEndian {
+		return []byte{byte(u & 0xff), byte(u >> 8)}
+	}
+	return []byte{byte(u >> 8), byte(u & 0xff)}
 }
 
 func concatBytes(e ...interface{}) []byte {
