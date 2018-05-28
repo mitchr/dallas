@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/Mitchell-Riley/dallas/compiler"
@@ -33,7 +34,7 @@ func main() {
 
 	inFile, err := ioutil.ReadFile(inName)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	var output []byte
@@ -48,11 +49,11 @@ func main() {
 
 	outFile, err := os.Create(*progName)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	_, err = outFile.Write(output)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 }
