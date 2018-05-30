@@ -7,14 +7,13 @@ import (
 
 // return err if no token could be found for the given input
 func tokenMatch(b []byte) ([]byte, error) {
-	if e, ok := oneBytes[string(b)]; ok {
-		return []byte{e}, nil
+	if e, ok := Tokens[Token{string(b), false}]; ok {
+		return []byte{e.(byte)}, nil
 	}
-	if e, ok := twoBytes[string(b)]; ok {
-		// not sure why this needs to be in BigEndian, but otherwise it's fucked
-		return splitUint16(e, binary.BigEndian), nil
+	if e, ok := Tokens[Token{string(b), true}]; ok {
+		return splitUint16(e.(uint16), binary.BigEndian), nil
 	}
-	return nil, fmt.Errorf("token not found %s", string(b))
+	return nil, fmt.Errorf("token not found for string: %s", string(b))
 }
 
 // tokenizes a []byte b and appends it to *[]byte t
@@ -49,7 +48,7 @@ func lex(b []byte) []byte {
 			tokenize(curTok, &tokBuf)
 			// depending on what v is, append it so it doesn't get lost
 			// v is only 1 element, so it can only belong to oneBytes
-			tokBuf = append(tokBuf, oneBytes[string(v)])
+			tokBuf = append(tokBuf, Tokens[Token{string(v), false}].(byte))
 			curTok = []byte{}
 		case ' ': //'(':
 			curTok = append(curTok, v)

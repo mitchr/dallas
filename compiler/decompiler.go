@@ -58,11 +58,11 @@ func combine2ByteElements(b []byte) []uint16 {
 }
 
 func backwardsLex(u uint16) (string, error) {
-	if p, ok := revTwoBytes[u]; ok {
-		return p, nil
+	if p, ok := revTokens[u]; ok {
+		return p.Name, nil
 	}
-	if p, ok := revOneBytes[byte(u)]; ok {
-		return p, nil
+	if p, ok := revTokens[byte(u)]; ok {
+		return p.Name, nil
 	}
 	return "", fmt.Errorf("token not found for key %#x", u)
 }
