@@ -114,7 +114,13 @@ func title(p string) []byte {
 	return title
 }
 
-func Compile(f []byte, p string, a bool, t bool) []byte {
+// f is the slice containing the source code
+// p is the program title
+// a sets the archive byte
+// t sets the output device
+// if f is too large, Compile might take an ungodly amount of time to finish
+// streaming would be a more elegant solution to this
+func Compile(f []byte, p string, a, t bool) []byte {
 	identifier := "**TI83F*"
 	if t {
 		identifier = "**TI83**"

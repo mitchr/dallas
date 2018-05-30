@@ -17,10 +17,9 @@ Flag|Type|Description
 -e|bool|set the edit-lock bit
 -h|bool|display this help message
 -ti83|bool|compile for the TI-83
--o|string|set the name of the output file (default "PROG.8xp")
 -p|string|set the program name (default "PROG")
 
-Some tokens had to be changed from their unicode format to an ascii format:
+Some tokens had to be changed from unicode to ascii, so that you can actually type them:
 
 Calculator|Dallas
 ---|---
@@ -36,6 +35,11 @@ T (transpose)|transpose
 ≥|>=
 ≠|!=
 π|pi
-- (neg)|neg
+-(neg)|^-
 √(|sqrt(
 ³√(|crt(
+
+
+### Sources
+[TI-83+/TI-84+ file format guide](http://merthsoft.com/linkguide/ti83+/fformat.html)
+[Token List](http://tibasicdev.wikidot.com/one-byte-tokens)
