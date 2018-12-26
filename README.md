@@ -1,5 +1,5 @@
 # dallas
-[![Build Status](https://travis-ci.org/Mitchell-Riley/dallas.svg?branch=master)](https://travis-ci.org/Mitchell-Riley/dallas)
+[![Build Status](https://travis-ci.org/mitchr/dallas.svg?branch=master)](https://travis-ci.org/mitchr/dallas)
 
 ## About
 dallas is a TI-BASIC compiler. It supports the TI-83 and TI-83+/TI-84+.
