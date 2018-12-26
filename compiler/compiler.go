@@ -66,12 +66,12 @@ func lex(b []byte) []byte {
 }
 
 // Check if the '-' is a negative, or if it is performing subtraction
+// and return the correct respective byte for negation or subtraction
 // taken from http://math.stackexchange.com/a/217316:
 // - If you have numbers or variables on both sides of symbol −− then it means substraction.
 // - If you have no number or variables before the symbol −− then it means negation.
 //   Beware: parenthesis aren't variables.
-// returns true for negative, false for subtraction
-func parseNegOrMinus(b []byte) bool {
+func parseNegOrMinus(b []byte) byte {
 	const NEG = 0xB0 // 176
 	const SUB = 0x71 // 45
 
@@ -79,15 +79,14 @@ func parseNegOrMinus(b []byte) bool {
 	var previous byte
 	for i, v := range b {
 		if v == '-' {
-			// also check if the first index of b is a '-';
-			// short circuit, but not sure if it's worth it
+			// check if the first index of b is a '-';
 			if i == 0 || previous == '(' || previous == '\n' || previous == '\r' {
-				return true
+				return NEG
 			}
 		}
 		previous = v
 	}
-	return false
+	return SUB
 }
 
 // returns the lower 16 bits of the sum of all bytes in b

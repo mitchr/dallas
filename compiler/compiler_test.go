@@ -97,18 +97,21 @@ func TestQuine(t *testing.T) {
 }
 
 func TestParseNegOrMinus(t *testing.T) {
+	const NEG = 0xB0
+	const SUB = 0x71
+
 	tests := []struct {
 		data []byte
-		neg  bool
+		neg  byte
 	}{
-		{[]byte(`-3`), true},
-		{[]byte(`(-3)`), true},
-		{[]byte(`- 3`), true},
-		{[]byte(`-(-3)`), true},
+		{[]byte(`-3`), NEG},
+		{[]byte(`(-3)`), NEG},
+		{[]byte(`- 3`), NEG},
+		{[]byte(`-(3)`), NEG},
 
-		{[]byte(`1-3`), false},
-		{[]byte(`1 - 3`), false},
-		{[]byte(`(1-3)`), false},
+		{[]byte(`1-3`), SUB},
+		{[]byte(`1 - 3`), SUB},
+		{[]byte(`(1-3)`), SUB},
 	}
 
 	for _, v := range tests {
