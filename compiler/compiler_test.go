@@ -132,6 +132,8 @@ func TestTitle(t *testing.T) {
 		"MOZZARELLA",
 		"JAYWALKING",
 		"a",
+		"four",
+		"five5",
 		",",
 		"~",
 		"asdlhfiuwehqcwo8rqw89enryc9823nc792c29378c32789q2789y3q278932y7r82q3yr78932qyr98",
