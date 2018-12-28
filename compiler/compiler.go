@@ -154,8 +154,10 @@ func Compile(f []byte, p string, a, t bool) []byte {
 // low 8-bits of u ordered depending on the byte order argument
 func splitUint16(u uint16, b binary.ByteOrder) []byte {
 	if b == binary.LittleEndian {
+		// LSB first
 		return []byte{byte(u & 0xff), byte(u >> 8)}
 	}
+	// MSB first
 	return []byte{byte(u >> 8), byte(u & 0xff)}
 }
 
