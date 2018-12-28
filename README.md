@@ -5,7 +5,7 @@
 dallas is a TI-BASIC compiler. It supports the TI-83 and TI-83+/TI-84+.
 
 ## Installation
-`go get github.com/Mitchell-Riley/dallas`
+`go get github.com/mitchr/dallas`
 
 ## Usage
 `dallas [flags] filename`

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Mitchell-Riley/dallas/compiler"
+	"github.com/mitchr/dallas/compiler"
 )
 
 var (
