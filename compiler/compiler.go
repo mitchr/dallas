@@ -39,8 +39,12 @@ func lex(b []byte) []byte {
 	var curTok bytes.Buffer
 	for i, v := range b {
 		switch v {
-		// case '-':
-		case '\r', '\n', '+', '-', '*', '/', '^', '=':
+		case '-':
+			s := parseNegOrMinus(b[i-1 : i])
+			tokBuf.Write(tokenize(curTok.Bytes()))
+			tokBuf.WriteByte(s)
+			curTok.Reset()
+		case '\r', '\n', '+', '*', '/', '^', '=': // '-'
 			// on Windows, carriage return contains 2 characters, but we only care about '\n'
 			if v == '\r' {
 				break
