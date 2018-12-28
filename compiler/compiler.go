@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -18,24 +19,24 @@ func tokenMatch(b []byte) ([]byte, error) {
 
 // tokenizes a []byte b and appends it to *[]byte t
 // takes a pointer so we are able to mutate the slice without having to return it
-func tokenize(b []byte, t *[]byte) {
-	if e, err := tokenMatch(b); err == nil {
-		*t = append(*t, e...)
+func tokenize(b []byte) []byte {
+	if e, _ := tokenMatch(b); e != nil {
+		return e
 	} else {
 		// range over every rune and match it with a token
+		var tokBuf []byte
 		for _, v := range b {
 			if e, err := tokenMatch([]byte{v}); err == nil {
-				*t = append(*t, e...)
-			} // else {
-			// 	return err
-			// }
+				tokBuf = append(tokBuf, e...)
+			}
 		}
+		return tokBuf
 	}
 }
 
 func lex(b []byte) []byte {
-	var tokBuf []byte
-	var curTok []byte
+	var tokBuf bytes.Buffer
+	var curTok bytes.Buffer
 	for i, v := range b {
 		switch v {
 		// case '-':
@@ -45,24 +46,24 @@ func lex(b []byte) []byte {
 				break
 			}
 
-			tokenize(curTok, &tokBuf)
+			tokBuf.Write(tokenize(curTok.Bytes()))
 			// depending on what v is, append it so it doesn't get lost
 			// v is only 1 element, so it can only belong to oneBytes
-			tokBuf = append(tokBuf, Tokens[Token{string(v), false}].(byte))
-			curTok = []byte{}
+			tokBuf.WriteByte(Tokens[Token{string(v), false}].(byte))
+			curTok.Reset()
 		case ' ': //'(':
-			curTok = append(curTok, v)
-			tokenize(curTok, &tokBuf)
-			curTok = []byte{}
+			curTok.WriteByte(v)
+			tokBuf.Write(tokenize(curTok.Bytes()))
+			curTok.Reset()
 		default:
-			curTok = append(curTok, v)
+			curTok.WriteByte(v)
 			// last element of slice; AKA eof
 			if i == len(b)-1 {
-				tokenize(curTok, &tokBuf)
+				tokBuf.Write(tokenize(curTok.Bytes()))
 			}
 		}
 	}
-	return tokBuf
+	return tokBuf.Bytes()
 }
 
 // Check if the '-' is a negative, or if it is performing subtraction
