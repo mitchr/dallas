@@ -41,5 +41,5 @@ T (transpose)|transpose
 
 
 ### Sources
-[TI-83+/TI-84+ file format guide](http://merthsoft.com/linkguide/ti83+/fformat.html)
-[Token List](http://tibasicdev.wikidot.com/one-byte-tokens)
+* [TI-83+/TI-84+ file format guide](http://merthsoft.com/linkguide/ti83+/fformat.html)
+* [Token List](http://tibasicdev.wikidot.com/one-byte-tokens)
